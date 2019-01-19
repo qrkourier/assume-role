@@ -345,6 +345,7 @@ export-envars() {
     AWS_ACCESS_KEY_ID=$(echo "$ROLE_SESSION" | jq -r .Credentials.AccessKeyId)
     AWS_SECRET_ACCESS_KEY=$(echo "$ROLE_SESSION" | jq -r .Credentials.SecretAccessKey)
     AWS_SESSION_TOKEN=$(echo "$ROLE_SESSION" | jq -r .Credentials.SessionToken)
+    AWS_SESSION_EXPIRY=$(jq -r .Credentials.Expiration <<< "$ROLE_SESSION")
     export AWS_ACCESS_KEY_ID
     export AWS_SECRET_ACCESS_KEY
     export AWS_SESSION_TOKEN
@@ -354,7 +355,9 @@ export-envars() {
     export AWS_ACCOUNT_ROLE="$role"
     export ROLE_SESSION_START="$ROLE_SESSION_START"
     export GEO_ENV="$account_name" # For GeoEngineer https://github.com/coinbase/geoengineer
-    echo_out "Success! IAM session envars are exported."
+    #AWS_ACCOUNT_ALIAS=$(aws --output json iam list-account-aliases | jq -r .AccountAliases[0])
+    #echo_out "You are ${role}@${account_name} ($AWS_ACCOUNT_ALIAS) until $(date -d $AWS_SESSION_EXPIRY '+%H:%M %Z')"
+    echo_out "You are ${role}@${account_name} until $(date -d $AWS_SESSION_EXPIRY '+%H:%M %Z')"
   fi
 
   # OUTPUTS ALL THE EXPORTS for eval $(assume-role [args])
