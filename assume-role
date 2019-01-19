@@ -106,8 +106,8 @@ setup() {
   fi
 
   # Force use of ~/.aws/credentials file which contains aws login account
-  unset AWS_ACCESS_KEY_ID
-  unset AWS_SECRET_ACCESS_KEY
+  #unset AWS_ACCESS_KEY_ID
+  #unset AWS_SECRET_ACCESS_KEY
   unset AWS_SESSION_TOKEN
   unset AWS_SECURITY_TOKEN
 
@@ -169,7 +169,8 @@ setup() {
   fi
 
   # set region
-  AWS_CONFIG_REGION="$(aws configure get region --profile ${default_profile})"
+  #AWS_CONFIG_REGION="$(aws configure get region --profile ${default_profile})"
+  AWS_CONFIG_REGION="$(aws configure get region)"
   if [ -z "$aws_region_input" ] && [ -z "$AWS_REGION" ] && [ -z "$AWS_DEFAULT_REGION" ] && [ -z "$AWS_CONFIG_REGION" ] && [ -z "$OUTPUT_TO_EVAL" ]; then
     echo -n "Assume Into Region [us-east-1]: "
     read -r region
@@ -275,7 +276,8 @@ assume-role-with-bastion() {
     # check if the AWS_USERNAME has been preset
     if [ -z "$AWS_USERNAME" ]; then
       # get the username attached to your default creds
-      AWS_USERNAME=$(aws iam get-user --query User.UserName --output text --profile $default_profile)
+      #AWS_USERNAME=$(aws iam get-user --query User.UserName --output text --profile $default_profile)
+      AWS_USERNAME=$(aws iam get-user --query User.UserName --output text)
     else
       echo_out "Using AWS_USERNAME: $AWS_USERNAME"
     fi
@@ -284,7 +286,7 @@ assume-role-with-bastion() {
     MFA_DEVICE_ARGS=(--user-name "$AWS_USERNAME")
     MFA_DEVICE_ARGS+=(--query 'MFADevices[0].SerialNumber')
     MFA_DEVICE_ARGS+=(--output text)
-    MFA_DEVICE_ARGS+=(--profile "${default_profile}")
+    #MFA_DEVICE_ARGS+=(--profile "${default_profile}")
     MFA_DEVICE=$(aws iam list-mfa-devices "${MFA_DEVICE_ARGS[@]}")
     MFA_DEVICE_STATUS=$?
 
@@ -297,7 +299,7 @@ assume-role-with-bastion() {
     SESSION_ARGS=(--duration-seconds "$SESSION_TIMEOUT")
     SESSION_ARGS+=(--serial-number "${MFA_DEVICE}")
     SESSION_ARGS+=(--token-code "${mfa_token}")
-    SESSION_ARGS+=(--profile "${default_profile}")
+    #SESSION_ARGS+=(--profile "${default_profile}")
     SESSION_ARGS+=(--output json)
 
     SESSION=$(aws sts get-session-token "${SESSION_ARGS[@]}")
