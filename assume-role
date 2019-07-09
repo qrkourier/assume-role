@@ -88,6 +88,12 @@ setup() {
     role_input=$2
     aws_region_input=$3
   else
+    while getopts :p OPT; do
+      case $OPT in
+        p) FLAGS+=$OPT ;;
+      esac
+    done
+    shift $((OPTIND-1))
     account_name_input=$1
     role_input=$2
     mfa_token_input=$3
@@ -299,7 +305,7 @@ assume-role-with-bastion() {
     SESSION_ARGS=(--duration-seconds "$SESSION_TIMEOUT")
     SESSION_ARGS+=(--serial-number "${MFA_DEVICE}")
     SESSION_ARGS+=(--token-code "${mfa_token}")
-    #SESSION_ARGS+=(--profile "${default_profile}")
+    [[ ${FLAGS:-} =~ p ]] && SESSION_ARGS+=(--profile "${default_profile}")
     SESSION_ARGS+=(--output json)
 
     SESSION=$(aws sts get-session-token "${SESSION_ARGS[@]}")
